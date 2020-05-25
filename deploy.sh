@@ -54,13 +54,21 @@ function deployServicemesh(){
     ### Install Service Mesh Control Plane 
     oc apply -f ServiceMeshControlPlane.yaml
 
+    sleep $((RANDOM % MAXWAIT))
+
+    oc get servicemeshcontrolplanes.maistra.io -n  ${SM_CP_NS} | grep InstallSuccessful > /dev/null
+    status="$?"
+    while [ "${status}" -ne 0 ]; do
+      sleep $((RANDOM % MAXWAIT))
+      oc get servicemeshcontrolplanes.maistra.io -n  ${SM_CP_NS} | grep InstallSuccessful > /dev/null
+      status="$?"
+    done 
+
     ### Create NS for bookinfo app
     oc new-project "${CP_APP}"
 
     ### Install Service Mesh Member Roll
     oc apply -f ServiceMeshMemberRoll.yaml
-
-    sleep 60
 }
 
 function deployBookinfo(){
@@ -71,17 +79,20 @@ function deployBookinfo(){
 
     oc apply -n "${CP_APP}" -f https://raw.githubusercontent.com/Maistra/istio/maistra-1.1/samples/bookinfo/networking/bookinfo-gateway.yaml
 
-    export GATEWAY_URL=$(oc -n ${SM_CP_NS} get route istio-ingressgateway -o jsonpath='{.spec.host}')
-
     oc apply -n "${CP_APP}" -f https://raw.githubusercontent.com/Maistra/istio/maistra-1.1/samples/bookinfo/networking/destination-rule-all.yaml
-
-    echo $GATEWAY_URL
 
     sleep 60
 
 }
 
 function mTLS(){
+
+    sed -i "s/SUBDOMAIN_BASE/$SUBDOMAIN_BASE/g" ./details-virtualservice.yml
+    sed -i "s/SUBDOMAIN_BASE/$SUBDOMAIN_BASE/g" ./productpage-gateway.yml
+    sed -i "s/SUBDOMAIN_BASE/$SUBDOMAIN_BASE/g" ./productpage-virtualservice.yml
+    sed -i "s/SUBDOMAIN_BASE/$SUBDOMAIN_BASE/g" ./ratings-virtualservice.yml
+    sed -i "s/SUBDOMAIN_BASE/$SUBDOMAIN_BASE/g" ./reviews-virtualservice.yml
+    sed -i "s/SUBDOMAIN_BASE/$SUBDOMAIN_BASE/g" ./wildcard-gateway.yml
 
     ### Create secret 
     oc create secret tls istio-ingressgateway-certs --cert tls.crt --key tls.key -n $SM_CP_NS
@@ -143,4 +154,3 @@ case $1 in
   *)
     log "Usage: $0 <generateCerts|deployServicemesh|deployBookinfo|mTLS|all>"
 esac
-
