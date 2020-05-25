@@ -1,0 +1,12 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: productpage-destinationrule-mtls
+spec:
+  host: productpage.bookinfo.svc.cluster.local
+# host: $ERDEMO_USER-incident-service.$ERDEMO_NS.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+

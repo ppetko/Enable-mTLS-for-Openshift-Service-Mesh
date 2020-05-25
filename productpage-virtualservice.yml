@@ -1,0 +1,19 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: productpage-service-virtualservice-mtls
+spec:
+  hosts:
+  - productpage.apps.SUBDOMAIN_BASE
+  gateways:
+  - bookinfo-wildcard-gateway.bookretail-istio-system.svc.cluster.local
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 9080
+        host: productpage.bookinfo.svc.cluster.local
