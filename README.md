@@ -13,16 +13,15 @@ Kubernetes Version: v1.16.2
 
 ```
 
-### In an OpenShift environment, a route is used to expose services outside the cluster. Through the route, traffic is directed to the service pods.
+In an OpenShift environment, a route is used to expose services outside the cluster. Through the route, traffic is directed to the service pods.
 
-### In a service mesh, a better approach is to use a gateway for incoming traffic. This allows service mesh policies and routing rules to be applied to traffic entering the service mesh.
+In a service mesh, a better approach is to use a gateway for incoming traffic. This allows service mesh policies and routing rules to be applied to traffic entering the service mesh.
 
-### The service mesh installs an Istio ingress gateway service, which is an Envoy proxy container running on its own. All incoming traffic into the service mesh should be routed through the Istio ingress gateway to ensure that mesh policies and routing rules are applied to incoming traffic.
+The service mesh installs an Istio ingress gateway service, which is an Envoy proxy container running on its own. All incoming traffic into the service mesh should be routed through the Istio ingress gateway to ensure that mesh policies and routing rules are applied to incoming traffic.
 
-### To route the traffic from the ingress gateway to the target services, Gateway and VirtualService resources are defined. One way to do this is to create Gateway and VirtualService resources for each service exposed outside of the cluster. An alternative is to use a single wildcard Gateway resource along with the VirtualService resource for each service. The latter is the approach taken in this lab.
+To route the traffic from the ingress gateway to the target services, Gateway and VirtualService resources are defined. One way to do this is to create Gateway and VirtualService resources for each service exposed outside of the cluster. An alternative is to use a single wildcard Gateway resource along with the VirtualService resource for each service. The latter is the approach taken in this lab.
 
-### The ingress gateway also ensures end-to-end encryption for incoming traffic: TLS termination happens at the ingress gateway, and traffic is re-encrypted by the gateway using OpenShift Service Mesh mTLS functionality before routing to the service. To achieve this, the public TLS key and certificate are mounted into the ingress gateway pods using a secret.
-
+The ingress gateway also ensures end-to-end encryption for incoming traffic: TLS termination happens at the ingress gateway, and traffic is re-encrypted by the gateway using OpenShift Service Mesh mTLS functionality before routing to the service. To achieve this, the public TLS key and certificate are mounted into the ingress gateway pods using a secret.
 
 ## High-level architecture
 
